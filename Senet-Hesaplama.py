@@ -6,49 +6,40 @@ import plotly.graph_objects as go
 # Sayfa Ayarları
 st.set_page_config(page_title="Kurter Finans | Pro", page_icon="🏦", layout="centered")
 
-# Gelişmiş Tasarım ve Başlık Süsleme
+# CSS: Hatalı sızıntıları engelleyen ve tasarımı düzelten temiz kod
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-    .block-container { padding-top: 1.5rem; padding-bottom: 0rem; }
-    
-    /* Başlık Süsleme */
+    .block-container { padding-top: 1rem; padding-bottom: 0rem; }
     .main-title { 
         text-align: center; 
-        color: #0f172a; 
+        color: #f8fafc; 
         font-family: 'Inter', sans-serif;
-        font-size: 28px; 
+        font-size: 26px; 
         font-weight: 800; 
-        margin-bottom: 0px;
         letter-spacing: -0.5px;
+        margin-bottom: 0px;
     }
     .sub-title {
         text-align: center;
-        color: #64748b;
+        color: #94a3b8;
         font-size: 10px;
         text-transform: uppercase;
         letter-spacing: 3px;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
-    .title-underline {
-        width: 50px;
-        height: 3px;
-        background: #1e293b;
-        margin: 0 auto 20px auto;
-        border-radius: 2px;
-    }
-
-    /* İmza ve Metrik Stilleri */
-    .signature { font-family: 'Dancing Script', cursive; font-size: 40px; color: #0f172a; margin-top: 10px; }
-    .corporate-text { color: #94a3b8; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-top: -10px; }
-    .stMetric { border: 1px solid #f1f5f9; padding: 8px; border-radius: 12px; background: #ffffff; }
+    .signature { font-family: 'Dancing Script', cursive; font-size: 36px; color: #f8fafc; margin-top: 5px; }
+    .corporate-text { color: #64748b; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-top: -10px; }
+    /* Metrik kutularını koyu temaya uydurma */
+    [data-testid="stMetric"] { background-color: #1e293b; border: 1px solid #334155; padding: 10px; border-radius: 10px; }
+    [data-testid="stMetricValue"] { color: #f8fafc !important; }
+    [data-testid="stMetricLabel"] { color: #94a3b8 !important; }
     </style>
     """, unsafe_allow_html=True)
 
-# Süslü Başlık Alanı
+# Başlık Alanı
 st.markdown('<div class="main-title">KURTER FINANS</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">Strategic Asset Analysis</div>', unsafe_allow_html=True)
-st.markdown('<div class="title-underline"></div>', unsafe_allow_html=True)
 
 # Girişler
 c1, c2, c3 = st.columns([1.5, 1, 1.2])
@@ -73,31 +64,32 @@ if ana_para > 0 and kalan_gun > 0:
     m2.metric("Gün", f"{kalan_gun}")
     m3.metric("Net Kâr", f"{faiz_kazanci:,.0f}")
 
-    # Grafik - Yazıların kesilmemesi için 'pull' ve 'margin' ayarı eklendi
+    # Grafik - Parlak ve Okunaklı Yazılar
     fig = go.Figure(data=[go.Pie(
         labels=['Ana Para', 'Kâr'], 
         values=[ana_para, faiz_kazanci], 
         hole=.7,
-        marker=dict(colors=['#1e293b', '#94a3b8']), 
+        marker=dict(colors=['#334155', '#38bdf8']), # Koyu Gri ve Parlak Mavi
         textinfo='label+percent',
-        textposition='outside', # Yazıları dışarı aldık ama alanı genişlettik
-        pull=[0, 0.05], # Kâr dilimini hafifçe öne çıkararak yer açtık
-        textfont=dict(size=13, color='#0f172a')
+        textposition='outside',
+        textfont=dict(size=14, color='#f8fafc') # Beyaz ve büyük font
     )])
     
     fig.update_layout(
-        height=280, # Okunaklılık için yüksekliği biraz artırdık
-        margin=dict(l=60, r=60, t=20, b=20), # Kenar boşluklarını artırarak yazıların kesilmesini önledik
+        height=300,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=50, r=50, t=30, b=30),
         showlegend=False,
-        annotations=[dict(text=f"₺{toplam_tutar:,.0f}", x=0.5, y=0.5, font_size=15, showarrow=False, font_color="#0f172a")]
+        annotations=[dict(text=f"₺{toplam_tutar:,.0f}", x=0.5, y=0.5, font_size=16, showarrow=False, font_color="#f8fafc")]
     )
     
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-    st.markdown(f"<p style='text-align: center; color: #64748b; font-size: 11px; margin-top:-10px;'>Vergi Avantajı: {vergi_avantaji:,.0f} ₺</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align: center; color: #94a3b8; font-size: 11px;'>Vergi Avantajı: {vergi_avantaji:,.0f} ₺</p>", unsafe_allow_html=True)
 
-# --- İMZA BÖLÜMÜ ---
+# --- İMZA BÖLÜMÜ (TEMİZLENMİŞ) ---
 st.markdown(f"""
-    <div style='text-align: center; border-top: 1px solid #f1f5f9; margin-top: 10px; padding-top: 10px;'>
+    <div style='text-align: center; border-top: 1px solid #334155; margin-top: 20px; padding-top: 10px;'>
         <div class='signature'>Kurter</div>
         <div class='corporate-text'>Strategic Assets & Risk Management</div>
     </div>
