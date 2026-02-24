@@ -3,72 +3,68 @@ import pandas as pd
 from datetime import datetime
 import plotly.graph_objects as go
 
-# Sayfa Ayarları - Mobil öncelikli daraltılmış görünüm
-st.set_page_config(page_title="Kurter Finans", page_icon="📈", layout="centered")
+# Sayfa Ayarları
+st.set_page_config(page_title="Kurter Finans | Pro", page_icon="🏦", layout="centered")
 
-# Görsel Stil Ayarları (Boşlukları daraltma ve ortalama)
+# Google Fonts'dan El Yazısı Fontu ve Kurumsal Stil
 st.markdown("""
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
     <style>
-    .block-container { padding-top: 1rem; padding-bottom: 0rem; }
-    h1 { text-align: center; color: #1e3a8a; font-size: 24px !important; }
-    .stMetric { background-color: #ffffff; padding: 10px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    [data-testid="stHeader"] {background: rgba(0,0,0,0);}
+    .block-container { padding-top: 1.5rem; padding-bottom: 0rem; }
+    h1 { text-align: center; color: #334155; font-size: 26px !important; font-weight: 700; margin-bottom: 0.5rem; }
+    .signature { font-family: 'Dancing Script', cursive; font-size: 32px; color: #1e293b; margin-top: 10px; }
+    .corporate-text { color: #64748b; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; margin-top: -5px; }
+    .stMetric { border: 1px solid #e2e8f0; padding: 10px; border-radius: 12px; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🏦 Kurter Finans Analiz")
+st.title("Kurter Finans Analiz")
 
-# Giriş ve Sonuçları içiçe geçirerek yerden tasarruf ediyoruz
+# Girişler - Maksimum Kompaktlık
 col1, col2 = st.columns(2)
 with col1:
-    ana_para = st.number_input("Senet (₺)", min_value=0.0, value=100000.0, step=1000.0)
+    ana_para = st.number_input("Senet Tutarı (₺)", min_value=0.0, value=100000.0, step=1000.0)
+    secilen_faiz = st.slider("Faiz (%)", 1, 100, 53)
 with col2:
-    secilen_faiz = st.number_input("Faiz (%)", min_value=1, max_value=100, value=53)
+    vade_tarihi = st.date_input("Vade Tarihi", value=datetime(2026, 6, 24))
+    st.markdown("<br>", unsafe_allow_html=True)
+    # Hızlı Bilgi Kartı
+    bugun = datetime.now().date()
+    kalan_gun = (vade_tarihi - bugun).days
+    st.info(f"⏳ Kalan: {kalan_gun} Gün")
 
-vade_tarihi = st.date_input("Vade Tarihi", value=datetime(2026, 6, 24))
-
-# Hesaplamalar
-bugun = datetime.now().date()
-kalan_gun = (vade_tarihi - bugun).days
-
-if kalan_gun <= 0:
-    st.error("⚠️ İleri tarih seçin.")
-elif ana_para > 0:
+if ana_para > 0 and kalan_gun > 0:
     faiz_kazanci = ana_para * (secilen_faiz / 100) * (kalan_gun / 365)
     toplam_tutar = ana_para + faiz_kazanci
-    vergi_avantaji = faiz_kazanci * 0.075
+    
+    # Metrikler
+    m1, m2 = st.columns(2)
+    m1.metric("Vade Sonu Toplam", f"{toplam_tutar:,.0f} ₺")
+    m2.metric("Net Faiz Getirisi", f"{faiz_kazanci:,.0f} ₺")
 
-    # Metrikleri tek satıra sığdırıyoruz
-    m1, m2, m3 = st.columns(3)
-    m1.metric("Toplam", f"{toplam_tutar:,.0f}")
-    m2.metric("Gün", f"{kalan_gun}")
-    m3.metric("Net Kâr", f"{faiz_kazanci:,.0f}")
-
-    # Donut Grafik - Boyutu küçültülmüş
+    # Grafik - Minimalist Stil
     fig = go.Figure(data=[go.Pie(
-        labels=['Sermaye', 'Kazanç'], 
+        labels=['Anapara', 'Kazanç'], 
         values=[ana_para, faiz_kazanci], 
-        hole=.7,
-        marker=dict(colors=['#1e3a8a', '#fbbf24']),
+        hole=.75,
+        marker=dict(colors=['#475569', '#cbd5e1']), # Slate ve Light Gray
         textinfo='none'
     )])
     
     fig.update_layout(
-        height=220, # Yüksekliği ciddi oranda azalttık
+        height=200,
         margin=dict(l=0, r=0, t=0, b=0),
         showlegend=True,
-        legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5),
-        annotations=[dict(text=f"%{secilen_faiz}", x=0.5, y=0.5, font_size=18, showarrow=False, font_color="#1e3a8a")]
+        legend=dict(orientation="h", yanchor="bottom", y=-0.1, xanchor="center", x=0.5)
     )
     
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-    
-    st.markdown(f"<p style='text-align: center; color: #1e3a8a; font-size: 14px;'><b>Vergi Avantajı: {vergi_avantaji:,.2f} ₺</b></p>", unsafe_allow_html=True)
 
-# --- İMZA ---
-st.markdown("""
-    <div style='text-align: center; border-top: 1px solid #e2e8f0; margin-top: 10px; padding-top: 5px;'>
-        <h4 style='color: #1e3a8a; margin: 0; letter-spacing: 2px;'><b>K U R T E R</b></h4>
-        <p style='color: #fbbf24; font-size: 12px; margin: 0;'>♉ TAURUS DISCIPLINE</p>
+# --- ÖZEL EL YAZISI İMZA VE KURUMSAL ALT BİLGİ ---
+st.markdown("---")
+st.markdown(f"""
+    <div style='text-align: center;'>
+        <div class='signature'>Kurter</div>
+        <div class='corporate-text'>Strategic Assets & Risk Management</div>
     </div>
     """, unsafe_allow_html=True)
